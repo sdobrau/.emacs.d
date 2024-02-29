@@ -21,6 +21,17 @@
 (leaf consult-extras
   :require t)
 
+(leaf smex
+  :ensure t
+  :require t
+  :preface (setq smex-history-length 20)
+  :bind (("M-x". smex)
+         ("s-x" . execute-extended-command))
+  :custom ((smex-prompt-string . "⧒ ")
+           (smex-auto-update . nil)) ;; smex smex to update
+  :config
+  (smex-initialize))
+
 (leaf embark
   :ensure t
   :preface
