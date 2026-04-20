@@ -1,0 +1,2 @@
+;; Generated package description from free-keys.el  -*- no-byte-compile: t -*-
+(define-package "free-keys" "1.0" "Show free keybindings for modkeys or prefixes" '((cl-lib "0.3")) :commit "6f9172376af4d399c7853cbdfdd7425348a878f9" :authors '(("Matus Goljer" . "matus.goljer@gmail.com")) :maintainer '("Matus Goljer" . "matus.goljer@gmail.com") :keywords '("convenience") :url "https://github.com/Fuco1/free-keys")

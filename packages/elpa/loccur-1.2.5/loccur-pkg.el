@@ -1,0 +1,2 @@
+;; Generated package description from loccur.el  -*- no-byte-compile: t -*-
+(define-package "loccur" "1.2.5" "Perform an occur-like folding in current buffer" '((emacs "25.1")) :commit "2120345933a1617cc5359dabd7636fd3479441bf" :authors '(("Alexey Veretennikov" . "alexey.veretennikov@gmail.com")) :maintainer '("Alexey Veretennikov" . "alexey.veretennikov@gmail.com") :keywords '("matching") :url "https://github.com/fourier/loccur")

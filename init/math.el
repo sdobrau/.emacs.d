@@ -1,5 +1,8 @@
+;; -*- lexical-binding: t -*-
+
+;; TODO: factor for dabbrev
 (leaf calc-extras
- :require t
+ :commands
  :config
  ;; divisions done by float always
  ;; wasamasa

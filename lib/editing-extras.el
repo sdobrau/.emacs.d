@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 ;;; mine
 
 (defun new-line-below-and-indent ()
@@ -6,11 +8,37 @@
   (end-of-line)
   (newline-and-indent))
 
+;;; from kf
+
+(defun kf-fill-paragraph (&optional justify)
+  "Like fill-paragraph, but don't mark the buffer as modified if no change.
+
+Emacs's native fill-paragraph is like the burglar who breaks into
+your house, rearranges all your furniture exactly as it was, and
+departs: even if the result of the fill is to leave the buffer in
+exactly the same state, it still marks the buffer as modified so you
+know you've been broken into.
+
+Note: to get this accepted into Emacs, it should watch the md5sum for
+just the affected region rather than the entire buffer.  See
+`fill-region' and `fill-region-as-paragraph' in textmodes/fill.el.
+The elegant solution would be a new macro, '(detect-buffer-unmodified
+from to)' or something, that just wraps the relevant body of code in
+those two functions.  Then it could be used by other fill functions
+easily too."
+  (interactive "P")
+  (let ((orig-md5sum (md5 (current-buffer)))
+        (was-modified-before-fill (buffer-modified-p)))
+    (fill-paragraph justify)
+    (let ((new-md5sum (md5 (current-buffer))))
+      (when (string-equal orig-md5sum new-md5sum)
+        (set-buffer-modified-p was-modified-before-fill)))))
+
 ;;; adam
 
 ;; https://adam.kruszewski.name/2022-05-08-backward-kill-word-or-join-lines.html
 
-;;;###2autoload
+;;;###autoload
 (defun backward-kill-word-or-join-lines ()
   "Backward-kill-word that will join lines if there is no word on a current line to kill."
   (interactive)
@@ -93,229 +121,6 @@
     ;; `anzu' isn't compatible OOTB
     (call-interactively #'query-replace-regexp)))
 
-;;; from kf: surround str with char
-
-(defun kf-surround-with (char &optional parg)
-  "Insert two of the same CHAR around a string near point.  The string
-is delimited by whitespace, although the function will do the right
-thing at beginning or end of line/buffer.  Also does the right thing
-if the char is one of a matching pair.
-
-Certain chars stand for more complex markup in certain modes: for
-example, 's' does HTML <strong></strong> tags, and 'e' does emphasis
-tags for various markup languages.  The markup syntax is determined
-using kf-markup-flavor; note that XML is interpreted to mean the
-DocBook Lite DTD.
-
-The prefix arg has various meanings.  Usually it means don't do
-complex markup, but in a few cases, where non-complex markup would
-virtually never be useful and there are two useful forms of complex
-markup, it signals which of the two forms to generate."
-  (interactive "*cSurround with char: \nP")
-  ;; hmm, ought to be able to do this with syntax tables?
-  (let
-      ((begthing char)
-       (endthing char)
-       (handle-ac nil) ; special case for LaTeX \ac{...}
-       (markup-flavor (kf-markup-flavor)))
-    ;; Generally, default to HTML if no known extension.
-    (cond
-     ((and (not parg) (equal char ?a))
-      (cond
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\ac{")
-        (setq handleg-ac t)
-        (setq endthing "}"))))
-     ((and (not parg) (equal char ?b))
-      (cond
-       ((eq markup-flavor 'xml)
-        (setq begthing "<emphasis role=\"bold\">")
-        (setq endthing "</emphasis>"))
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\textbf{")
-        (setq endthing "}"))
-       ((or (eq markup-flavor 'html) (eq major-mode 'text-mode))
-        (setq begthing "<strong>")
-        (setq endthing "</strong>"))))
-     ((and (not parg) (equal char ?i))
-      (cond
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\textit{")
-        (setq endthing "}"))
-       (t
-        (setq begthing "<i>")
-        (setq endthing "</i>"))))
-     ((and (not parg) (equal char ?c))
-      (cond
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\code{")
-        (setq endthing "}"))
-       ((eq markup-flavor 'xml)
-        (setq begthing "<code>")
-        (setq endthing "</code>"))
-       (t ; Ah, what the heck, let's default to XML anyway.
-        (setq begthing "<code>")
-        (setq endthing "</code>"))))
-     ((and (not parg) (equal char ?e))
-      (cond
-       ((eq markup-flavor 'xml)
-        (setq begthing "<emphasis>")
-        (setq endthing "</emphasis>"))
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\emph{")
-        (setq endthing "}"))
-       ((or t ; Remove this `t' if we ever choose another default for "e".
-            (eq markup-flavor 'html)
-            (eq major-mode 'text-mode))
-        (setq begthing "<em>")
-        (setq endthing "</em>"))))
-     ((and (not parg) (equal char ?f))
-      (cond
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\fullref{")
-        (setq endthing "}"))
-       ((eq markup-flavor 'texi)
-        (setq begthing "@file{")
-        (setq endthing "}"))
-       ((eq markup-flavor 'xml)
-        (setq begthing "<firstterm>")
-        (setq endthing "</firstterm>"))))
-     ((and (not parg) (equal char ?r))
-      (when (eq markup-flavor 'ltx)
-        (setq begthing "\\ref{")
-        (setq endthing "}")))
-     ((and (not parg) (equal char ?u))
-      (if (eq markup-flavor 'ltx)
-          (progn
-            (setq begthing "\\otsurl{")
-            (setq endthing "}"))
-        (setq begthing "<url>")
-        (setq endthing "</url>")))
-     ((and (not parg) (equal char ?t))
-      (cond
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\texttt{")
-        (setq endthing "}"))
-       (t
-        (setq begthing "<tt>")
-        (setq endthing "</tt>"))))
-     ((and (not parg) (equal char ?s))
-      (cond
-       ((eq markup-flavor 'html)
-        (setq begthing "<strong>")
-        (setq endthing "</strong>"))
-       ((eq markup-flavor 'ltx)
-        (setq begthing "\\textbf{ ")
-        (setq endthing "}"))
-       ((eq markup-flavor 'xml)
-        (setq begthing "<systemitem>")
-        (setq endthing "</systemitem>"))))
-     ((and (not parg) (equal char ?l))
-      (setq begthing "<literal>")
-      (setq endthing "</literal>"))
-     ((and (not parg) (equal char ?r))
-      (cond
-       ((eq markup-flavor 'xml)
-        (setq begthing "<remark>")
-        (setq endthing "</remark>"))
-       ((eq markup-flavor 'html)
-        (setq begthing "<font color=\"red\">")
-        (setq endthing "</font>"))))
-     ((and (not parg) (equal char ?e))
-      (cond
-       ((eq markup-flavor 'xml)
-        (setq begthing "<emphasis>")
-        (setq endthing "</emphasis>"))
-       ((eq markup-flavor 'texi)
-        (setq begthing "@emph{")
-        (setq endthing "}"))
-       ((eq markup-flavor 'ltx)
-        (setq begthing "{\\em ")
-        (setq endthing "}"))))
-     ((and (not parg) (equal char ?c))
-      (cond
-       ((eq markup-flavor 'texi)
-        (setq begthing "@code{")
-        (setq endthing "}"))
-       ((eq markup-flavor 'xml)
-        (setq begthing "<comment><para>(")
-        (setq endthing ")</para></comment>"))))
-     ((and (not parg) (equal char ?n))
-      (cond
-       ((eq markup-flavor 'xml)
-        (setq begthing "<note>")
-        (setq endthing "</note>"))))
-     ((and (not parg) (equal char ?F))
-      (cond
-       ((eq markup-flavor 'xml)
-        (setq begthing "<filename>")
-        (setq endthing "</filename>"))))
-     ((equal char ?x)
-      (cond
-       ((eq markup-flavor 'xml)
-        (if parg
-            (progn
-              (setq begthing "<phrase output=\"printed\"> in <xref linkend=\"")
-              (setq endthing "\" /></phrase>"))
-          (setq begthing "<xref linkend=\"")
-          (setq endthing "\"/>")))))
-     ((or (equal char ?{) (equal char ?}))    ; get matching char
-      (setq begthing ?{)
-      (setq endthing ?}))
-     ((or (equal char ?\() (equal char ?\)))  ; get matching char
-      (setq begthing ?\()
-      (setq endthing ?\)))
-     ((or (equal char ?<) (equal char ?>))    ; get matching char
-      (setq begthing ?<)
-      (setq endthing ?>))
-     ((and (equal char ?') (eq major-mode 'emacs-lisp-mode))
-      (setq begthing ?`)
-      (setq endthing ?'))
-     ;; Having backticks on both sides is useful in some wikis.
-     ;; ((equal char ?`)    ; do matching quote, but only via backtick
-     ;;  (setq begthing ?`)
-     ;;  (setq endthing ?'))
-     ((or (equal char ?\[) (equal char ?\]))    ; get matching char
-      (setq begthing ?\[)
-      (setq endthing ?\]))
-     ((and (not parg)                         ; do *TeX quotes
-           (equal char ?\")
-           (eq markup-flavor 'ltx)
-           (not (nth 4 (syntax-ppss)))) ; see commit 2b404e8391b7 of
-                                        ; 30 Aug 2016 in GNU Emacs.
-      (setq begthing "``")
-      (setq endthing "''")))
-
-    ;; Okay, now discover the appropriate boundaries and surround:
-    (re-search-backward "^\\|\\s-" (point-min))
-    (if (not (bolp))
-        (re-search-forward "\\s-")
-      (if (looking-at "\\s-") (re-search-forward "\\s-")))
-    (if (stringp begthing)
-        (insert begthing)
-      (insert-char begthing 1))
-    (let ((opoint (point)))
-      (if (re-search-forward "\\s-\\|\n" (point-max) t)
-          (forward-char -1)
-        (goto-char (point-max)))
-      (let ((lastchar (char-after (1- (point)))))
-        (if (= lastchar ?,)
-            (forward-char -1)))
-      (if (stringp endthing)
-          (insert endthing)
-        (insert-char endthing 1))
-      (if (= (point) (1+ opoint))
-          (forward-char -1)
-        (when handle-ac
-          ;; Since we know we're surrounding an acronym, let's take
-          ;; care of upcasing the surrounded text too -- thus
-          ;; relieving my grateful pinkies of some shift-key time.
-          (upcase-region opoint (point))
-          ;; Leave point right before the opening "{", in case this
-          ;; "\ac" needs to be "\acp" or one of other other variants.
-          (goto-char (1- opoint))))
-      )))
-
 ;;; from excalamus: convert bs to fs / \
 
 ;; (defun xc/convert-slashes (&optional beg end)
@@ -332,6 +137,7 @@ markup, it signals which of the two forms to generate."
 
 ;;; from junkw: kill-word-dwim
 
+;;;###autoload
 (defun kill-word-dwim (arg)
   "Call the `kill-word'  you want (Do What I Mean).
 
@@ -351,5 +157,7 @@ With argument ARG, do kill commands that many times."
                   (kill-word arg))
                  (t
                   (beginning-of-thing 'word) (kill-word arg)))))))
+
+
 
 (provide 'editing-extras)

@@ -1,4 +1,0 @@
-
-
-
-(provide 'elmacro-extras)

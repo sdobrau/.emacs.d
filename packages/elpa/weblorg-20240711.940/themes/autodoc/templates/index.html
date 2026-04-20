@@ -1,0 +1,32 @@
+{# index.html --- Template for the index page -*- Mode: Jinja2; -*- #}
+
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block nav %}{% endblock %}
+
+{% block page %}
+  <div class="page index">
+    <div class="banner">
+      <h1>{{ project_name }}</h1>
+      <div class="sub">
+        {{ project_description }}
+      </div>
+    </div>
+
+    <div class="menu">
+      <ul>
+        <li><a href="{{ url_for("docs", slug="index") }}">documentation</a></li>
+        <li><a href="{{ url_for("api") }}">api reference</a></li>
+        <li><a href="{{ project_github }}" target="_blank">github</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <article>
+        {{ post.html|safe }}
+      </article>
+    </div>
+  </div>
+{% endblock %}

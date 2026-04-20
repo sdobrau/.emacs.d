@@ -1,0 +1,2 @@
+;; Generated package description from auto-dim-other-buffers.el  -*- no-byte-compile: t -*-
+(define-package "auto-dim-other-buffers" "2.2.1" "Makes windows without focus less prominent" '((emacs "27.1")) :commit "0164908fd3f8d8e83aa636f08096dcc843d6b2fa" :authors '(("Michal Nazarewicz" . "mina86@mina86.com")) :maintainer '("Michal Nazarewicz" . "mina86@mina86.com") :keywords '("faces") :url "https://github.com/mina86/auto-dim-other-buffers.el")

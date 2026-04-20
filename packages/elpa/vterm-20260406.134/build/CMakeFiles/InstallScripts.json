@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/sdobrau/.emacs.d/packages/elpa/vterm-20260406.134/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

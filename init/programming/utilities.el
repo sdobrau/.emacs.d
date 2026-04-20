@@ -1,10 +1,10 @@
 (leaf xref
   :ensure t
   :hook (xref-after-return-hook . recenter)
-  :custom (xref-marker-ring . 100)) ; should be enough
+  :custom (xref-marker-ring . 30)) ; should be enough
 
-(leaf ggtags
+;; TODO: what ?
+(leaf symbols-outline
+  :if (executable-find "ctags")
   :ensure t
-  :hook (python-mode-hook . gtags-mode)
-  :bind ((:python-mode-map
-          (("M-." . ggtags-find-tag-dwim)))))
+  :bind (:prog-mode-map (("M-g s" . symbols-outline-show))))

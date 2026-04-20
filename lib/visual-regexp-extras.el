@@ -1,6 +1,0 @@
-
-
-
-
-
-(provide 'visual-regexp-extras)

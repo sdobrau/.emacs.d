@@ -1,3 +1,7 @@
+;; -*- lexical-binding: t -*-
+
+(require 'shr)
+
 ;;; mine:
 ;;;; get shr image at point
 ;;;;; little utility
@@ -9,39 +13,6 @@
 
 (defun shr-get-extension-of-image-url (url)
   (-last-item (s-split "\\." url)))
-
-
-;;;;; defvars
-
-(defvar exwm-shr-image-directory (no-littering-expand-var-file-name
-                                  "eww/images/")
-  "Directory to download images to with eww.")
-(defvar shr-last-downloaded-image-location nil
-  "Path of last downloaded image.")
-
-;;;;; front-end
-
-(defun shr-download-image-at-point (&optional url)
-  "Download image at point in shr-image-directory."
-  (interactive "P")
-  (let ((url (or url ;; if called outside of here
-                 (or (get-text-property (point) 'image-url)
-                     (thing-at-point 'url)))))
-    (if (not url) (message "No image under point")
-      (progn
-        (let ((loc (if current-prefix-arg
-                       (read-file-name
-                        "Eww image dir: "
-                        (concat
-                         exwm-shr-image-directory
-                         (shr-get-last-node-of-url url)))
-
-                     (concat
-                      exwm-shr-image-directory
-                      (shr-get-last-node-of-url url)))))
-          (setq shr-last-downloaded-image-location loc)
-          (exwm-shell-command (concat "wget -O " loc " " url))
-          (message "downloaded image %s" loc))))))
 
 ;;;; get links
 
@@ -57,8 +28,6 @@
 
 ;;;; TODO: previous/next link skipping forms
 ;;; from some blog post i forgot lol
-
-(require 'shr)
 
 (defun shr-tag-dfn (dom)
   (shr-fontize-dom dom 'italic))
@@ -83,7 +52,7 @@
   (when-let* ((datetime (or
                          (dom-attr dom 'title)
                          (dom-attr dom 'datetime)))
-	            (start (point)))
+              (start (point)))
     (shr-generic dom)
     (shr-add-font start (point) 'shr-abbreviation)
     (add-text-properties
@@ -91,8 +60,6 @@
      (list
       'help-echo datetime
       'mouse-face 'highlight))))
-
-(provide 'shr-extras)
 
 ;;; jao: fixes for image rendering
 
@@ -130,14 +97,6 @@
   (shr-generic dom)
   (shr-ensure-paragraph))
 
-;;; mine
-
-;;;; open shr link in new tab
-
-(defun new-empty-buffer()
-  (interactive))
-
-
-(defun my-shr-browse-url-in-new-tab ())
+
 
 (provide 'shr-extras)

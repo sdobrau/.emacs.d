@@ -1,5 +1,8 @@
+;; -*- lexical-binding: t -*-
+
 ;;; from koekelas
 
+;;;###autoload
 (defun koek-mtn/next-word (&optional arg)
        "Move point to beginning of next word, repeat ARG times.
   Optional ARG is an integer and defaults to one.  When ARG is
@@ -17,6 +20,7 @@
       (when (forward-word step)
         (backward-word step)))))
 
+;;;###autoload
 (defun koek-mtn/previous-word (&optional arg)
        "Move point to ending of previous word, repeat ARG times.
   Optional ARG is an integer and defaults to one.  When ARG is
@@ -28,12 +32,13 @@
 
 ;;; from zk-phi: smart next-prev-line
 ;; TODO: don't go to end of line on blank line
+;;;###autoload
 (defun zk-phi-next-line (n)
        (interactive "p")
        (call-interactively 'next-line)
        (when (looking-back "^[\s\t]*" (point-at-bol))
              (let (goal-column) (back-to-indentation))))
-
+;;;###autoload
 (defun zk-phi-previous-line (n)
        (interactive "p")
        (call-interactively 'previous-line)

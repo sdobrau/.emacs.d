@@ -1,13 +1,84 @@
+;; -*- lexical-binding: t -*-
+
+;; the register
+
+(leaf register :custom (register-use-preview . 'never))
+
+;; TODO: change key not compat with ubuntu M-1 M-2 etc
+;; 1. register for quick - ctrl
+(leaf
+  register-quicknav
+  :bind
+  (("M-1" . register-quicknav-prev-register)
+    ("M-2" . register-quicknav-next-register)
+    ("M-3" . register-quicknav-point-to-unused-register)
+    ("C-x r C-c" . register-quicknav-clear-current-register)))
+
+;; 2. bookmark for bookmark-wide - alt
+;; TODO: replace with harpoon?
+;; https://github.com/otavioschwanck/harpoon.el
+
+(leaf
+  bookmark-in-project
+  :ensure t
+  :bind
+  (("M-)" . bookmark-in-project-jump-next)
+    ("M-(" . bookmark-in-project-jump-previous)
+    ("M-0" . bookmark-in-project-toggle)
+    ("M-9" . bookmark-in-project-jump)))
+
+;; 3. torus for most advanced (still project) - shift
+(leaf
+  torus
+  :ensure t
+  :custom
+  ((torus-history-maximum-elements . 800)
+    (torus-load-on-startup . t)
+    (torus-save-on-exit . t)
+    (torus-maximum-horizontal-split . 6)
+    (torus-maximum-vertical-split . 4)
+    (torus-dirname . "~/.emacs.d/torus")
+    (torus-autowrite-file . "~/.emacs.d/torus/torus.el")
+    (torus-autoread-file . "~/.emacs.d/torus/torus.el"))
+  :bind
+  (
+    (("S-<up>" . torus-add-location)
+      ("S-<down>" . torus-switch-location)
+      ("S-<left>" . torus-previous-location)
+      ("S-<right>" . torus-next-location)
+      ("C-c C-<up>" . torus-add-circle)
+      ("C-c C-<down>" . torus-switch-circle)
+      ("C-c C-<left>" . torus-previous-circle)
+      ("C-c C-<right>" . torus-next-circle)
+      ("C-c S-<up>" . torus-add-torus)
+      ("C-c S-<down>" . torus-switch-torus)
+      ("C-c S-<left>" . torus-previous-torus)
+      ("C-c S-<right>" . torus-next-torus)
+      ("C-x M-t i" . torus-info))))
+
+;; 4. buffer-ring for buffer tori - C-c C-b
+(leaf
+  buffer-ring
+  :ensure t
+  :bind
+  (:buffer-ring-mode-map
+    (("C-c C-b <up>" . buffer-ring-add)
+      ("C-c C-b <down>" . buffer-ring-drop-buffer)
+      ("C-c C-b <left>" . buffer-ring-prev-buffer)
+      ("C-c C-b <right>" . buffer-ring-next-buffer)
+      ("C-c C-b S-<down>" . buffer-ring-torus-switch-to-ring))))
+
 (setq-default line-move-visual nil)
 
-(leaf visible-mark
-  :ensure t)
+(leaf visible-mark :ensure t)
 
-(leaf rings
-  :custom ((global-mark-ring-max . 15000)
-           (mark-ring-max . 1500)
-           (kill-ring-max . 1500)
-           (kill-do-not-save-duplicates . t)))
+(leaf
+  rings
+  :custom
+  ((global-mark-ring-max . 15000)
+    (mark-ring-max . 1500)
+    (kill-ring-max . 1500)
+    (kill-do-not-save-duplicates . t)))
 
 ;; Pop mark again after being popped on subsequent c-spc
 ;; (setq set-mark-command-repeat-pop t)
@@ -18,7 +89,9 @@
 ;; =C-u SPC x2=: reverse direction.
 ;; =C-SPC=: go towards direction.
 
-(leaf bd-set-mark
+(leaf
+  bd-set-mark
+  :quelpa (bd-set-mark :fetcher github :repo "lewang/bd-set-mark")
   :bind ([remap set-mark-command] . bd-set-mark-command))
 
 ;; When popping mark, skip consecutive identical marks # koekelas
@@ -32,9 +105,6 @@
 ;; (funcall f)
 ;; (setq n (1- n)))))
 
-(leaf kill-ring-extras
-  :require t)
-
 ;; The following keys modify the selection:
 ;;
 ;; 1. @: append selection to previous kill and exit. for example, m-w d @ will
@@ -47,134 +117,137 @@
 ;; 7. C-g: abort
 ;; 8. ?: help
 
-(leaf movement-extras
-  :require t
-  :bind ((:prog-mode-map
-          (([remap next-line] . zk-phi-next-line)
-           ([remap previous-line] . zk-phi-previous-line)))
-         (:text-mode-map
-          (([remap next-line] . zk-phi-next-line)
-           ([remap previous-line] . zk-phi-previous-line)))
-         ;; 'python-mode-map' void error when loading this
-         ;; do i have to?
-         ;; (:python-mode-map
-         ;;  (([remap next-line] . zk-phi-next-line)
-         ;;   ([remap previous-line] . zk-phi-previous-line)))
-         ("M-f" . koek-mtn/next-word)
-         ("M-b" . koek-mtn/previous-word)))
+(leaf
+  movement-extras
+  :bind
+  (
+    (:prog-mode-map
+      (([remap next-line] . zk-phi-next-line)
+        ([remap previous-line] . zk-phi-previous-line)))
+    (:text-mode-map
+      (([remap next-line] . zk-phi-next-line)
+        ([remap previous-line] . zk-phi-previous-line)))
+    ;; 'python-mode-map' void error when loading this
+    ;; do i have to?
+    ;; (:python-mode-map
+    ;;  (([remap next-line] . zk-phi-next-line)
+    ;;   ([remap previous-line] . zk-phi-previous-line)))
+    ;; only forward, backward is default.
+    ("M-f" . koek-mtn/next-word)))
 
 ;; =M-del=: delete subword.
 ;; =C-m-<backspace>=: delete superword.
 
-(leaf subword
-  :require t
-  :global-minor-mode subword-mode
-  :bind (("C-M-<backspace>" . backward-kill-superword)))
+(leaf subword-extras :bind (("C-M-<backspace>" . backward-kill-superword)))
 
-(leaf subword-extras
-  :after subword
-  :commands backward-kill-superword)
-
-;; COMMIT: change keybindings
-(leaf dogears
+;; TODO: is-in-stash-p ignored functions
+;; TODO: see how try-vc works, does remember work onto every dir ?
+(leaf
+  dogears
+  :disabled t
   :ensure t
-  :after savehist
-  :global-minor-mode dogears-mode
-  :bind (("M-g ." . dogears-go)
-         ("M-g l" . dogears-back)
-         ("M-g ;" . dogears-forward)
-         ("M-g ?" . dogears-list)
-         ("M-g -" . dogears-sidebar))
-
-  :custom ((dogears-idle . 3)
-           (dogears-limit . 2000))
+  :preface
+  :bind (("C-<" . dogears-back) ("C->" . dogears-forward) ("M-g d" . dogears-list))
+  :custom ((dogears-idle . 20) (dogears-limit . 50))
   :config
   ;; https://github.com/alphapapa/dogears.el/issues/4
-  (add-to-list 'savehist-additional-variables 'dogears-list)
-  (add-to-list 'dogears-ignore-modes 'eww-mode))
+  (add-to-list 'dogears-ignore-modes 'eww-mode)
+  (add-to-list 'dogears-ignore-modes 'org-mode))
 
-;; COMMIT: change goto-address with simpler global-goto-address-mode
-(leaf goto-address
-  :ensure nil
-  :hook (global-goto-address-mode))
+(leaf goto-address :ensure nil :hook (global-goto-address-mode))
 
 ;; https://www.yahoo.com
 ;; https://www.google.com
 
-(leaf goto-char-preview
+(leaf
+  goto-char-preview
   :ensure t
-  :bind (("M-g c" . nil)
-         ("M-g c" . goto-char-preview)))
+  :bind (("M-g c" . nil) ("M-g c" . goto-char-preview)))
 
-(leaf goto-line-preview
+(leaf
+  goto-line-preview
   :ensure t
-  :hook ((goto-line-preview-before-hook
-          goto-line-preview-after-hook) . dimmer-mode)
-  :bind (("M-g g" . nil)
-         ("M-g g" . goto-line-preview)))
+  :bind (("M-g g" . nil) ("M-g g" . goto-line-preview)))
 
-(leaf ace-jump-mode
+(leaf
+  ace-jump-mode
   :ensure t
-  ;; COMMIT: keybinding for ace-jump
-  :bind ("C-c j" . ace-jump-char-mode)
+  :bind ("C-M-j" . ace-jump-char-mode)
   :custom (ace-jump-mode-gray-background . nil))
 
-;; COMMIT: add `link-hint`
-;; link navigation
-
 ;; for multiple types of links anywhere
-(leaf link-hint
+(leaf
+  link-hint
   :ensure t
-  :bind (("C-c C-o" . link-hint-open-link)
-         (:eww-mode-map
-          (("F" . link-hint-open-link)))
-         (:nov-mode-map
-          (("F" . link-hint-open-link))))
-  :custom ((link-hint-message . nil)
-           (link-hint-restore . t)))
+  :bind
+  (("C-c C-_" . link-hint-open-link) ;; C-c C-/
+    ("C-c /" . link-hint-open-link-at-point)
+    (:eww-mode-map
+      (("F" . link-hint-open-link) ("f" . link-hint-open-link-at-point)))
+    (:nov-mode-map
+      (("F" . link-hint-open-link) ("f" . link-hint-open-link-at-point))))
+  :custom ((link-hint-message . nil) (link-hint-restore . t)))
 
-;; COMMIT: remove zzz-to-char, replace with ace-jump-zap
-(leaf zzz-to-char
+(leaf
+  ace-jump-zap
   :ensure t
-  :after avy
   :custom (zzz-to-char-reach . 800)
-  :bind ("M-z" . zzz-up-to-char))
+  :bind ("M-z" . ace-jump-zap-up-to-char-dwim))
 
-(leaf smartscan
+(leaf
+  smartscan
   :ensure t
-  :hook (prog-mode-hook . smartscan-mode)
-  :custom ((smartscan-symbol-selector . "symbol")
-           (smartscan-use-extended-syntax . t)))
+  :bind
+  (
+    (:special-mode-map
+      (("M-n" . smartscan-symbol-go-forward)
+        ("M-p" . smartscan-symbol-go-backward)))
+    (:Man-mode-map
+      (("M-n" . smartscan-symbol-go-forward)
+        ("M-p" . smartscan-symbol-go-backward))))
 
-(leaf goto-last-change
+  :custom ((smartscan-symbol-selector . "symbol") (smartscan-use-extended-syntax . t)))
+(leaf smart-mark :ensure t)
+
+(leaf
+  goto-chg
   :ensure t
-  :require t
-  :bind ("M-g l" . goto-last-change-with-auto-marks))
+  :bind (("M-g l" . goto-last-change) ("M-g C-l" . goto-last-change-reverse)))
 
-(leaf beginend
+;; some binds
+;; TODO: lazy
+
+(leaf beginend :ensure t)
+
+(leaf
+  simple
+  :bind (("C-x f 2" . end-of-buffer) ("C-x f 1" . beginning-of-buffer)))
+
+(leaf
+  spatial-navigate
   :ensure t
-  :global-minor-mode beginend-global-mode)
+  :bind
+  (:prog-mode-map
+    (("M-K" . spatial-navigate-backward-vertical-bar)
+      ("M-J" . spatial-navigate-forward-vertical-bar)
+      ("M-H" . spatial-navigate-backward-horizontal-bar)
+      ("M-L" . spatial-navigate-forward-horizontal-bar))))
 
-;; COMMIT change keybindings
-(leaf spatial-navigate
-  :ensure t
-  :bind (:prog-mode-map
-         (("M-K" . spatial-navigate-backward-vertical-bar)
-          ("M-J" . spatial-navigate-forward-vertical-bar)
-          ("M-H" . spatial-navigate-backward-horizontal-bar)
-          ("M-L" . spatial-navigate-forward-horizontal-bar))))
+(leaf
+  scroll
+  :hook
+  ((eshell-mode-hook erc-mode-hook telega-chat-mode-hook)
+    .
+    (lambda ()
+      (setq-local scroll-margin 0)
+      (setq-local scroll-up-aggressively 0.0))))
 
-(leaf scroll
-  :hook ((eshell-mode-hook
-          erc-mode-hook
-          telega-chat-mode-hook) . (lambda () (setq-local scroll-margin 0)
-          (setq-local scroll-up-aggressively 0.0))))
-
-(setq-default scroll-conservatively 10000
-              maximum-scroll-margin 0.5
-              scroll-error-top-bottom nil
-              ;; Preserve screen point position when scrolling
-              scroll-preserve-screen-position t
-              fast-but-imprecise-scrolling t
-              ;; counter emacs sluggishness when scrolling very fast
-              scroll-margin 5)
+(setq-default
+  scroll-conservatively 10000
+  maximum-scroll-margin 0.5
+  scroll-error-top-bottom nil
+  ;; Preserve screen point position when scrolling
+  scroll-preserve-screen-position t
+  fast-but-imprecise-scrolling t
+  ;; counter emacs sluggishness when scrolling very fast
+  scroll-margin 5)

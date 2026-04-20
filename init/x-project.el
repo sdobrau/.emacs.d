@@ -1,51 +1,40 @@
-;; COMMIT: add bookmark-in-project and project-x
-(leaf project-x
-  :quelpa (project-x
-           :fetcher github
-           :repo "karthink/project-x")
-  :require t
-  :custom (project-x-local-identifier
-           . '(".project" ; anything
-               "TAGS" "GTAGS"                   ; tags
-               "configure.ac" "configure.in"    ; autoconf
-               "cscope.out"                     ; cscope
-               "SConstruct"                     ; scons
-               "meson.build"                    ; meson
-               "default.nix" "flake.nix"        ; nix
-               "WORKSPACE"                      ; bazel
-               "debian/control"                 ; debian
-               "Makefile" "GNUMakefile" "CMakeLists.txt"  ; Make & CMake
-               "composer.json"   ; PHP
-               "rebar.config" "mix.exs"      ; Erlang & Elixir
-               "Gruntfile.js" "gulpfile.js" "package.json" "angular.json" ; KS
-               ;; Python
-               "manage.py" "requirements.txt" "setup.py" "tox.ini" "Pipfile"
-               "poetry.lock"
+;;https://mocompute.codeberg.page/item/2024/2024-09-03-emacs-project-vterm.html
+(defun my-project-shell ()
+  "Start an inferior shell in the current project's root directory.
+If a buffer already exists for running a shell in the project's root,
+switch to it.  Otherwise, create a new shell buffer.
+With \\[universal-argument] prefix arg, create a new inferior shell buffer even
+if one already exists."
+  (interactive)
+  (require 'comint)
+  (let*
+    (
+      (default-directory (project-root (project-current t)))
+      (default-project-shell-name (project-prefixed-buffer-name "shell"))
+      (shell-buffer (get-buffer default-project-shell-name)))
+    (if (and shell-buffer (not current-prefix-arg))
+      (if (comint-check-proc shell-buffer)
+        (pop-to-buffer shell-buffer
+          (bound-and-true-p display-comint-buffer-action))
+        (vterm shell-buffer))
+      (vterm (generate-new-buffer-name default-project-shell-name)))))
 
-               "pom.xml" "build.gradle" "gradlew" "application.yml"    ; Java & friends
-               "build.sbt" "build.sc"                                  ; Scala
-               "project.clj" "build.boot" "deps.edn" ".bloop"          ; Clojure
-               "Gemfile"                                               ; Ruby
-               "shard.yml"                                             ; Crystal
-               "Cask" "Eldev" "Keg" "Eask"                             ; Emacs
-               "DESCRIPTION"                                           ; R
-               "bower.json" "psc-package.json" "spago.dhall"           ; PureScript
-               "stack.yaml"                                            ; Haskell
-               "Cargo.toml"                                            ; Rust
-               "info.rkt"                                              ; Racket
-               "pubspec.yaml"                                          ; Dart
-               "dune-project"                                          ; OCaml
-               "go.mod"                                                ; Go
-               ))
-  :config
-  (setq project-x-save-interval 150)
-  (setq project-x-window-list-file
-        (no-littering-expand-var-file-name "project-x-window-list.el"))
-  (project-x-mode 1))
+(advice-add 'project-shell :override #'my-project-shell)
 
-(leaf bookmark-in-project
+(leaf find-file-in-project
   :ensure t
-  :bind (("C-x r M-n" . bookmark-in-project-jump-next)
-         ("C-x r M-p" . bookmark-in-project-jump-previous)
-         ("C-x r M-m" . bookmark-in-project-toggle)
-         ("C-x r M-b" . bookmark-in-project-jump)))
+  :custom (ffip-use-rust-fd . t)
+  :bind
+  (:project-prefix-map
+    (("f" . find-file-in-project)
+      ("d" . find-directory-in-project-by-selected))))
+
+;; TODO: rest project functions
+;; TODO: fix. completely broken
+(leaf isearch-project
+  :ensure t
+  :bind
+  (:project-prefix-map
+    :package
+    project
+    (("C-s" . isearch-project-forward-symbol-at-point))))

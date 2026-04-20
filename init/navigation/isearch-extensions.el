@@ -1,16 +1,3 @@
-(leaf phi-search
-  :ensure t
-  :require phi-replace)
-;; NOTE: cannot exit out of it if the window in which selection was started is
-;; deleted
-;; "target window deleted"
-;; :bind (("C-s" . phi-search)
-;;        ("C-r" . phi-search-backward)
-;;        ("M-%" . phi-replace-query)
-;;        (:Info-mode-map ;; phi is not recursive
-;;         ("C-s" . isearch-forward)
-;;         ("C-r" . isearch-backward))))
-
 (leaf anzu
   :ensure t
   :preface
@@ -25,7 +12,29 @@
                       (replace-query (format "(%d replace)" total))
                       (replace (format "(%d/%d)" here total)))))
         status)))
-  :global-minor-mode global-anzu-mode
   :config
   (setq anzu-mode-line-update-function 'tl/anzu-update-mode-line))
 
+(leaf isearch-other
+  :preface
+  (defun isearch-forward-other-window (prefix)
+    "Function to isearch-forward in other-window."
+    (interactive "P")
+    (unless (one-window-p)
+      (save-excursion
+        (let ((next (if prefix -1 1)))
+          (other-window next)
+          (isearch-forward)
+          (other-window (- next))))))
+
+  (defun isearch-backward-other-window (prefix)
+    "Function to isearch-backward in other-window."
+    (interactive "P")
+    (unless (one-window-p)
+      (save-excursion
+        (let ((next (if prefix 1 -1)))
+          (other-window next)
+          (isearch-backward)
+          (other-window (- next))))))
+  :bind (("C-c C-s" . isearch-forward-other-window)
+         ("C-c C-r" . isearch-backward-other-window)))

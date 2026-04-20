@@ -1,30 +1,47 @@
-(leaf alert
-  :ensure t)
+;; test
+(leaf alert :ensure t)
 
-;; COMMIT: declare autothemer (as dependency of kaolin-themes)
-(leaf autothemer
-  :ensure t)
-
-(leaf quick-peek ; flycheck-inline
+(leaf
+  quick-peek ; flycheck-inline
   :ensure t
-  :commands quick-peek-update
+  :commands
+  quick-peek-update
   quick-peek-hide
   quick-peek-overlay-contents
   quick-peek-overlay-ensure-at)
 
+(leaf mini-popup :if (display-graphic-p) :ensure t)
 
-(leaf popup ; google-translate / define-it / imenu-popup
+(leaf posframe :if (display-graphic-p) :ensure t)
+
+(leaf
+  popup ; google-translate / define-it / imenu-popup
   :ensure t
-  :commands popup-create
+  ;; TODO: lazy
+  :require t
   :config
-  (set-face-attribute 'popup-tip-face nil
-                      :background (color-darken-name (face-attribute 'default :background) 1.8)
-                      :foreground (color-lighten-name (face-attribute 'default :foreground) 1.2)))
+  (defun sd/popup-change-colors-on-theme-change (&optional theme)
 
-(leaf posframe ; dired-posframe, gts-do-translate
-  :ensure t)
+    (set-face-attribute 'popup-face nil
+      :background (face-attribute 'corfu-default :background))
+    (set-face-attribute 'popup-face nil
+      :foreground (face-attribute 'corfu-default :foreground))
 
-(leaf popup-imenu
-  :quelpa (popup-imenu
-           :fetcher github
-           :repo "ancane/popup-imenu"))
+    (set-face-attribute 'popup-menu-selection-face nil
+      :inherit 'corfu-current
+      :background)
+    (set-face-attribute 'popup-isearch-match nil
+      :inherit 'corfu-current
+      :background)
+    (set-face-attribute 'popup-isearch-match nil
+      :inherit 'corfu-current
+      :foreground))
+  (sd/popup-change-colors-on-theme-change)
+  :hook (enable-theme-functions . sd/popup-change-colors-on-theme-change)
+  :commands popup-create)
+
+(leaf
+  popup-imenu
+  :quelpa (popup-imenu :fetcher github :repo "ancane/popup-imenu")
+  :custom (popup-imenu-style . 'indent)
+  :bind (("M-g i" . popup-imenu) ("M-g q" . imenu)))

@@ -1,0 +1,1 @@
+((quelpa :repo "quelpa/quelpa" :fetcher github) (quelpa-leaf :fetcher git :url "https://github.com/quelpa/quelpa-leaf.git") (ultra-scroll :fetcher github :repo "jdtsmith/ultra-scroll") (whisper :fetcher github :repo "natrys/whisper.el"))

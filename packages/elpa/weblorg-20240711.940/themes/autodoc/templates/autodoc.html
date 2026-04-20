@@ -1,0 +1,50 @@
+{# api.html --- Template for auto generated API doc; -*- Mode: Jinja2; -*- #}
+
+{% extends "layout.html" %}
+
+{% block title %}api reference{% endblock %}
+
+{% block page %}
+  <div class="page api">
+    <div class="left-pane">
+      {% for section in sections %}
+        <h3>
+          <a href="#section-{{ section.slug }}">{{ section.name }}</a>
+        </h3>
+        <ul>
+          {% for symbol in section.symbols %}
+            <li><a href="#symbol-{{ symbol.name }}">{{ symbol.name }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+    </div>
+
+    <div class="content">
+      {% for section in sections %}
+        <article id="section-{{ section.slug }}" class="section">
+          <h1>{{ section.name }}</h1>
+
+          <div class="symbols">
+            {% for symbol in section.symbols %}
+              <div class="symbol" id="symbol-{{ symbol.name }}">
+                {% if symbol.type == "function" %}
+                  <h2>
+                    ({{ symbol.name }}{% if symbol.args %} {{ symbol.args }}{% endif %})
+                  </h2>
+                {% else %}
+                  <h2>{{ symbol.name }}</h2>
+                {% endif %}
+
+                {% if symbol.docs %}
+                  <div class="docstring">
+                    {{ symbol.docs|safe }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

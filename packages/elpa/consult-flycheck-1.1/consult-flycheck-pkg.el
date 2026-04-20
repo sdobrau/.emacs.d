@@ -1,0 +1,2 @@
+;; Generated package description from consult-flycheck.el  -*- mode: lisp-data; no-byte-compile: t -*-
+(define-package "consult-flycheck" "1.1" "Provides the command `consult-flycheck'" '((emacs "29.1") (consult "2.8") (flycheck "35")) :commit "9fe96c4b75c8566170ad41a04c3849d2e2606104" :maintainer '("Daniel Mendler" . "mail@daniel-mendler.de") :keywords '("languages" "tools" "completion") :url "https://github.com/minad/consult-flycheck")

@@ -1,11 +1,8 @@
 (leaf emacsql-sqlite
-  :ensure t
-  :require t)
+  :quelpa t)
 
-(leaf closql)
-
-(leaf prot-additions
-  :require prot-common prot-simple)
+(leaf closql
+  :ensure t)
 
 (leaf svg
   :ensure t)

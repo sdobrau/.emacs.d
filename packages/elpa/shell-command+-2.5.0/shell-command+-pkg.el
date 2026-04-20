@@ -1,0 +1,2 @@
+;; Generated package description from shell-command+.el  -*- no-byte-compile: t -*-
+(define-package "shell-command+" "2.5.0" "An extended shell-command" '((emacs "24.3")) :commit "8388de44c488106a53913e7028b0e3f3859982bb" :authors '(("Philip Kaludercic" . "philipk@posteo.net")) :maintainer '("Philip Kaludercic" . "philipk@posteo.net") :keywords '("unix" "processes" "convenience") :url "https://codeberg.org/pkal/shell-command-plus.el")

@@ -1,0 +1,2 @@
+;; Generated package description from frog-menu.el  -*- no-byte-compile: t -*-
+(define-package "frog-menu" "0.2.11" "Quickly pick items from ad hoc menus" '((emacs "26") (avy "0.4") (posframe "0.4")) :commit "3d99c10eb472b5f7fe761bb3f329fe10971ea903" :authors '(("Clemens Radermacher" . "clemera@posteo.net")) :maintainer '("Clemens Radermacher" . "clemera@posteo.net") :keywords '("convenience") :url "https://github.com/clemera/frog-menu")

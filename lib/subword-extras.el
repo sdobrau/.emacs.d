@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 ;;; mine
 
 ;;;###autoload
@@ -9,5 +11,7 @@
     (backward-word)
     (delete-region beg (point))
     (subword-mode)))
+
+
 
 (provide 'subword-extras)

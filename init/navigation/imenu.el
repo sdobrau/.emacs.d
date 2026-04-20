@@ -1,4 +1,3 @@
-;; COMMIT: move imenu-list to own imenu file
 (leaf imenu-list
   :ensure t
   :bind ("M-s i" . imenu-list-smart-toggle)

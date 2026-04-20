@@ -1,2 +1,0 @@
-
-(defvar test-var "aaa")

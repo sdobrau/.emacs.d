@@ -1,0 +1,218 @@
+[[https://www.gnu.org/licenses/gpl-3.0.txt][https://img.shields.io/badge/license-GPL_3-green.svg]]
+[[https://elpa.nongnu.org/nongnu/webpaste.html][https://elpa.nongnu.org/nongnu/webpaste.svg]]
+[[https://melpa.org/#/webpaste][https://melpa.org/packages/webpaste-badge.svg]]
+[[https://stable.melpa.org/#/webpaste][https://stable.melpa.org/packages/webpaste-badge.svg]]
+[[https://github.com/etu/webpaste.el/actions?query=workflow%3A%22Unit+tests%22][https://github.com/etu/webpaste.el/workflows/Unit%20tests/badge.svg]]
+[[https://github.com/etu/webpaste.el/actions?query=workflow%3A%22Integration+tests%22][https://github.com/etu/webpaste.el/workflows/Integration%20tests/badge.svg]]
+[[https://coveralls.io/github/etu/webpaste.el?branch=main][https://coveralls.io/repos/github/etu/webpaste.el/badge.svg?branch=main]]
+
+* Webpaste.el -- Paste text to pastebin-like services
+This mode allows to paste whole buffers or parts of buffers to
+pastebin-like services. It supports more than one service and will
+failover if one service fails. More services can easily be added
+over time and preferred services can easily be configured.
+
+* Table of Contents
+ - [[#webpasteel----paste-text-to-pastebin-like-services][Webpaste.el -- Paste text to pastebin-like services]]
+ - [[#installation][Installation]]
+   - [[#the-interactive-way][The interactive way]]
+   - [[#a-declarative-way-using-use-package][A declarative way (Using use-package)]]
+ - [[#configuration][Configuration]]
+   - [[#choosing-providers--provider-priority][Choosing providers / provider priority]]
+   - [[#only-paste-plaintext-pastes][Only paste plaintext pastes]]
+   - [[#confirm-pasting-with-a-yesno-confirmation-before-pasting][Confirm pasting with a yes/no confirmation before pasting]]
+   - [[#max-retries-on-failure][Max retries on failure]]
+   - [[#view-recently-created-pastes][View recently created pastes]]
+     - [[#send-the-returned-url-to-the-killring][Send the returned URL to the killring]]
+     - [[#copy-url-to-the-clipboard][Copy URL to the clipboard]]
+     - [[#open-the-recently-created-paste-in-the-browser][Open the recently created paste in the browser]]
+     - [[#use-a-custom-hook][Use a custom hook]]
+   - [[#custom-providers][Custom providers]]
+ - [[#providers-to-implement-710][Providers to implement]]
+
+* Installation
+The package is available on [[https://elpa.nongnu.org/][NonGNU ELPA]], which is part of the default set of
+repositories starting in Emacs 28. For information on how to add this
+repository if you're on an older Emacs, check the [[https://elpa.nongnu.org/][NonGNU ELPA]] instructions.
+
+** The interactive way
+You can install ~webpaste~ using the interactive ~package-install~ command
+like the following:
+#+BEGIN_CODE
+M-x package-install RET webpaste RET
+#+END_CODE
+
+** A declarative way (Using [[https://github.com/jwiegley/use-package][use-package]])
+This requires that you have [[https://github.com/jwiegley/use-package][use-package]] set up. But it's in my opinion the
+easiest way to install and configure packages.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package webpaste
+    :ensure t
+    :bind (("C-c C-p C-b" . webpaste-paste-buffer)
+           ("C-c C-p C-r" . webpaste-paste-region)
+           ("C-c C-p C-p" . webpaste-paste-buffer-or-region)))
+#+END_SRC
+
+* Configuration
+** Choosing providers / provider priority
+To select which providers to use in which order you need to set the variable
+=webpaste-provider-priority= which is a list of strings containing the
+providers names.
+
+Examples:
+#+begin_src emacs-lisp
+  ;; Choosing githup gist only
+  (setq webpaste-provider-priority '("gist.github.com"))
+
+  ;; Choosing ix.io as first provider and dpaste.org as second
+  (setq webpaste-provider-priority '("ix.io" "dpaste.org"))
+
+  ;; Choosing 1) ix.io, 2) dpaste.org, 3) dpaste.com
+  (setq webpaste-provider-priority '("ix.io" "dpaste.org" "dpaste.com"))
+
+  ;; You can always append this list as much as you like, and which providers
+  ;; that exists is documented below in the readme.
+#+end_src
+
+This can be added to the =:config= section of use-package:
+#+BEGIN_SRC emacs-lisp
+  (use-package webpaste
+    :ensure t
+    :bind (("C-c C-p C-b" . webpaste-paste-buffer)
+           ("C-c C-p C-r" . webpaste-paste-region)
+           ("C-c C-p C-p" . webpaste-paste-buffer-or-region))
+    :config
+    (progn
+      (setq webpaste-provider-priority '("ix.io" "dpaste.org"))))
+#+END_SRC
+
+** Only paste plaintext pastes
+If you don't want language detection you can define the following parameter
+that will tell the language detection to not check what language it is and
+not return anything to make it fallback to plaintext.
+
+Example:
+#+begin_src emacs-lisp
+  ;; Only paste raw pastes
+  (setq webpaste-paste-raw-text t)
+#+end_src
+
+** Confirm pasting with a yes/no confirmation before pasting
+To enable a confirmation dialog to always pop up and require you to confirm
+pasting before text is actually sent to a paste-provider you just need to set
+the variable =webpaste-paste-confirmation= to a value that is non-nil.
+
+Example:
+#+begin_src emacs-lisp
+  ;; Require confirmation before doing paste
+  (setq webpaste-paste-confirmation t)
+#+end_src
+
+Can also be put in the =:config= section of =use-package= the same way as the
+provider definitions above.
+
+** Max retries on failure
+To prevent infinite loops of retries there's an option named
+=webpaste-max-retries=, it's default value is =10=. Webpaste shouldn't try
+more than 10 times against remote services.
+
+This can be changed:
+#+begin_src emacs-lisp
+  ;; Do maximum 13 retries instead of standard 10
+  (setq webpaste-max-retries 13)
+#+end_src
+
+** View recently created pastes
+Webpaste gives you several options to view your successful paste.
+
+*** Send the returned URL to the killring
+This is webpaste's default behavior. After a successful paste, the returned URL
+from the provider will be sent to the killring. You can disable this with
+
+#+BEGIN_SRC emacs-lisp
+(setq webpaste-add-to-killring nil)
+#+END_SRC
+
+*** Copy URL to the clipboard
+If you have [[https://github.com/rolandwalker/simpleclip][simpleclip]] installed, you can copy the returned URL to the
+clipboard. You can enable this with
+
+#+BEGIN_SRC emacs-lisp
+  ;; To build your own hook to use simpleclip, you could do like this:
+  (add-hook 'webpaste-return-url-hook
+            (lambda (url)
+              (message "Copied URL to clipboard: %S" url)
+              (simpleclip-set-contents url)))
+#+END_SRC
+
+*** Open the recently created paste in the browser
+To enable opening of recently created pastes in an external browser, you can
+enable the option =webpaste-open-in-browser= by setting this value to a
+non-nil value.
+
+Example:
+#+begin_src emacs-lisp
+  ;; Open recently created pastes in an external browser
+  (setq webpaste-open-in-browser t)
+#+end_src
+
+Can also be put in the =:config= section of =use-package= the same way as the
+provider definitions above.
+
+*** Use a custom hook
+You can define a custom hook to send your URL's to when returning them from
+the paste provider. This is just like regular hooks for major modes etc. You
+can have several hooks as well if you want it to do several custom things.
+
+#+begin_src emacs-lisp
+  ;; Simple hook to just message the URL, this is more or less the default
+  ;; already. But if you disable the default and still want a message, this
+  ;; would work fine.
+  (add-hook 'webpaste-return-url-hook 'message)
+
+  ;; To build your own send-to-browser hook, you could do like this:
+  (add-hook 'webpaste-return-url-hook
+            (lambda (url)
+              (message "Opened URL in browser: %S" url)
+              (browse-url-generic url)))
+
+  ;; Simple hook to replicate the `webpaste-copy-to-clipboard' option
+  (add-hook 'webpaste-return-url-hook 'simpleclip-set-contents)
+#+end_src
+
+** Custom providers
+The example of one of the simplest providers possible to write:
+#+begin_src emacs-lisp
+  (require 'webpaste)
+  (add-to-list
+   'webpaste-providers-alist
+   '("example.com"
+     :uri "https://example.com/"
+     :post-field "content"
+     :success-lambda webpaste-providers-success-location-header))
+#+end_src
+
+Options available are the options used in webpaste--provider. These docs are
+available within emacs documentation. To read this you need to require
+webpaste first and then just read the documentation by running this:
+#+begin_src emacs-lisp
+  (require 'webpaste)
+  (describe-function 'webpaste--provider)
+#+end_src
+
+* TODO Providers to implement [7/14]
+ - [ ] clbin.com
+ - [ ] 0x0.st
+ - [X] ix.io
+ - [X] paste.rs
+ - [X] dpaste.com
+ - [X] dpaste.org
+ - [X] gist.github.com
+ - [X] paste.mozilla.org
+ - [X] bpa.st
+ - [ ] paste.debian.net
+ - [ ] bpaste.net
+ - [ ] eval.in
+ - [ ] ptpb.pw (RIP due to [[https://github.com/ptpb/pb/issues/245][ptpb/pb#245]] & [[https://github.com/ptpb/pb/issues/240][ptpb/pb#240]])
+ - [ ] sprunge.us (removed due to [[https://github.com/rupa/sprunge/issues/45][sprunge#45]] that yields 500s)
