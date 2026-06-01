@@ -59,7 +59,6 @@ RUN rm -rf .emacs.d
 RUN git clone https://github.com/sdobrau/.emacs.d
 # init emacs to download packages, install treesit grammars
 WORKDIR /home/emacs/.emacs.d
-RUN emacs --batch -l early-init.el -l init.el --eval \
-    "(progn (treesit-auto-install-all) (ghostel-download-module))"
+RUN emacs --batch -l early-init.el -l init.el --eval "(progn (treesit-auto-install-all) (ghostel-download-module))"
 
 ENTRYPOINT ["emacs"]
