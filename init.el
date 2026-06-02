@@ -114,6 +114,29 @@ With prefix argument ASYNC, refresh asynchronously."
 ;; `use-package` is built-in in Emacs 29+, but require it explicitly.
 (require 'use-package)
 
+;; hard dependency, place first 
+
+(use-package aggressive-indent
+  :ensure t
+  :custom
+  (aggressive-indent-dont-electric-modes '(yaml-mode python-mode emacs-lisp-mode))
+  (aggressive-indent-excluded-modes '(python-mode text-mode yaml-mode))
+  :config
+  ;;; fix, cancel excessive timers aggressive-indent--indent-if-changed
+  ;; https://github.com/Malabarba/aggressive-indent-mode/issues/112
+
+  (defun cancel-aggressive-indent-timers ()
+    (interactive)
+    (let ((count 0))
+      (dolist (timer timer-idle-list)
+        (when (eq 'aggressive-indent--indent-if-changed (aref timer 5))
+          (cl-incf count)
+          (cancel-timer timer)))
+      (when (> count 0)
+        (message "Cancelled %s aggressive-indent timers" count))))
+
+  (run-with-idle-timer 5 t 'cancel-aggressive-indent-timers))
+
 ;; * shell
 
 (setopt confirm-kill-processes nil)
@@ -232,7 +255,7 @@ then quit."
                      :sort-order newest-first
                      :key "d")
               (:name "📥 inbox"
-                     :query "tag:inbox"
+                     :query "tag:inbox -tag:deleted"
                      :sort-order newest-first
                      :key "a")
               (:name "📥 important"
@@ -260,6 +283,15 @@ then quit."
                 ("subject" . "%s"))
                . " %-80s  ")
               ("tags" . "(%s)")))
+           (notmuch-tree-thread-symbols
+            '((prefix . "╾")
+              (top . "─")
+              (top-tee . "┬")
+              (vertical . "│")
+              (vertical-tee . "├")
+              (bottom . "╰")
+              (arrow . "╴"))
+            )
            (notmuch-search-line-faces
             '(("unread" . notmuch-search-unread-face)
               ("flag" . italic)))
@@ -1510,9 +1542,9 @@ then quit."
   :ensure t
   :preface (defun sd/asciidoc-mode-hook ()
              (interactive)
-             (auto-fill-mode))
-  :hook ((asciidoc-mode-hook . auto-fill-mode)
-         (asciidoc-mode-hook . visual-line-mode))
+             (visual-line-mode)
+             (remove-hook 'after-save-hook #'whitespace-cleanup))
+  :hook (asciidoc-mode-hook . sd/asciidoc-mode-hook)
   :config (asciidoc-install-grammars))
 
 ;; ** lsp
@@ -1665,6 +1697,7 @@ then quit."
 
 (use-package
   prog-mode
+  :after aggressive-indent-mode
   :preface
   ;; spaces but tabs if available
   ;; https://www.emacswiki.org/emacs/SiteMap
@@ -1843,26 +1876,6 @@ then quit."
 (use-package align
   :ensure t)
 
-(use-package aggressive-indent
-  :ensure t
-  :custom
-  (aggressive-indent-dont-electric-modes '(yaml-mode python-mode emacs-lisp-mode))
-  (aggressive-indent-excluded-modes '(python-mode text-mode yaml-mode))
-  :config
-  ;;; fix, cancel excessive timers aggressive-indent--indent-if-changed
-  ;; https://github.com/Malabarba/aggressive-indent-mode/issues/112
-
-  (defun cancel-aggressive-indent-timers ()
-    (interactive)
-    (let ((count 0))
-      (dolist (timer timer-idle-list)
-        (when (eq 'aggressive-indent--indent-if-changed (aref timer 5))
-          (cl-incf count)
-          (cancel-timer timer)))
-      (when (> count 0)
-        (message "Cancelled %s aggressive-indent timers" count))))
-
-  (run-with-idle-timer 5 t 'cancel-aggressive-indent-timers))
 ;; ** programming utilities
 
 (use-package whitespace-cleanup-mode
@@ -2477,3 +2490,4 @@ then quit."
   :ensure t
   :init (global-jinx-mode)
   :custom (jinx-languages "en_GB"))
+
