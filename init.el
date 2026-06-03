@@ -2442,6 +2442,7 @@ then quit."
 ;; * terraform
 
 (use-package terraform-mode
+  :after magit
   :ensure t
   :custom ((terraform-indent-level 2))
   :config
