@@ -442,12 +442,12 @@ then quit."
   :ensure t
   :hook
   ((gptel-post-response-functions . gptel-end-of-response)
-   (gptel-post-stream-hook . gptel-auto-scroll)
-   (gptel-mode-hook . visual-line-mode))
+   (gptel-post-stream . gptel-auto-scroll)
+   (gptel-mode . visual-line-mode))
   :bind ("C-x C-g" . gptel-menu)
   :custom
   (
-   (gptel-model . 'llama3:8b-instruct-q8_0)
+   (gptel-model 'Ollama:llama3:8b-instruct-q8_0)
    (gptel-track-media t)
    (gptel-include-reasoning nil)
    (gptel-use-header-line nil)
