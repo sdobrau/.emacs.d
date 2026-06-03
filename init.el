@@ -468,7 +468,7 @@ then quit."
 
 ;; TODO
 (use-package agent-shell
-  :ensure t
+  :after magit
   :ensure t
   :custom (agent-shell-thought-process-expand-by-default t))
 
