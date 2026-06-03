@@ -51,7 +51,7 @@
 (setopt
  native-comp-speed 2
  ;; 4 cores
- native-comp-async-jobs-number 12
+ native-comp-async-jobs-number (string-to-number (shell-command-to-string "nproc"))
  native-comp-async-report-warnings-errors nil
  byte-compile-warnings nil
  bytecomp--inhibit-lexical-cookie-warning t
@@ -192,8 +192,6 @@ This is more detailed but adds overhead. Use it only when profiling.")
     (add-to-list 'load-path dir)
     (normal-top-level-add-subdirs-to-load-path)))
 
-(manateelazycat-add-subdirs-to-load-path
- (concat user-emacs-directory "packages/quelpa/build"))
 (manateelazycat-add-subdirs-to-load-path (concat user-emacs-directory "lib"))
 
 (setopt enable-local-variables ':all)
@@ -395,7 +393,7 @@ We prefer a system CA bundle to avoid spawning external processes
  package-user-dir
  (directory-file-name (concat user-emacs-directory "packages/elpa")) ; elpa pkgs
  load-prefer-newer t ; prefer newer things
- package-enable-at-startup nil ; package-initialize is later in after leaf
+ package-enable-at-startup t ; package-initialize is later in after leaf
  package-list-unversioned t ; unversioned pkg too in list/packages
  package-load-list '(all) ; load all
  package-native-compile nil) ; don’t compile at startup
