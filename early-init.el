@@ -1,8 +1,12 @@
 ;;; -*- lexical-binding: t -*-
 
+;; don't compile, otherwise compiles on each start
+
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
+
+(setopt compile-command nil)
 
 ;; dark
 
@@ -55,12 +59,9 @@
  byte-compile-docstring-max-column 120
  native-comp-async-query-on-exit t
  native-comp-warning-on-missing-source nil
- native-comp-jit-compilation t
- ;; handled by compile-angel for new files. not pkgs
- native-comp-always-compile t
- warning-suppress-types '((comp)) ; hide compilation warnings
- native-compile-target-directory (concat user-emacs-directory "data/eln-cache"))
-
+ native-comp-jit-compilation nil
+ native-comp-always-compile nil
+ warning-suppress-types '((comp))) ; hide compilation warnings
 ;;; * optional startup profiling
 
 (defvar sd/startup-profile-enabled
