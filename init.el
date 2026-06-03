@@ -1493,7 +1493,12 @@ then quit."
 
 ;; ** terminal
 
+;; dependency for ghostel
+(use-package dape
+  :ensure t)
+
 (use-package ghostel
+  :after dape
   :vc (:url "https://github.com/dakra/ghostel"
             :lisp-dir "lisp"
             :rev :newest)
