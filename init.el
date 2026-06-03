@@ -1698,14 +1698,7 @@ then quit."
   :ensure t
   :demand t)
 
-(use-package
-  prog-mode
-  :after aggressive-indent-mode
-  :preface
-  ;; spaces but tabs if available
-  ;; https://www.emacswiki.org/emacs/SiteMap
-
-  (defun infer-indentation-style ()
+(defun infer-indentation-style ()
     ;; if our source file uses tabs, we use tabs, if spaces spaces, and if
     ;; neither, we use the current indent-tabs-mode
     (let
@@ -1717,37 +1710,37 @@ then quit."
       (if (> tab-count space-count)
           (setq indent-tabs-mode t))))
 
-  (defun sd/prog-mode-hook (&optional arg)
-    "My setup for `prog-mode'."
-    (interactive "P")
-    ;; things to disable
-    (ispell-minor-mode -1)
-    (virtual-comment-mode)
-    (add-hook 'after-save-hook #'whitespace-cleanup)
-    (hl-line-mode)
-    (hl-column-mode)
-    ;; global in after-init
-    (eldoc-box-hover-at-point-mode)
-    ;; (add-to-list 'completion-at-point-functions #'cape-file)
-    ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+(defun sd/prog-mode-hook (&optional arg)
+  "My setup for `prog-mode'."
+  (interactive "P")
+  ;; things to disable
+  (ispell-minor-mode -1)
+  (virtual-comment-mode)
+  (add-hook 'after-save-hook #'whitespace-cleanup)
+  (hl-line-mode)
+  (hl-column-mode)
+  ;; global in after-init
+  (eldoc-box-hover-at-point-mode)
+  ;; (add-to-list 'completion-at-point-functions #'cape-file)
+  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; (add-to-list 'completion-at-point-functions #'cape-keyword) ;;
+  ;; (add-to-list 'completion-at-point-functions #'cape-keyword) ;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; (add-to-list 'completion-at-point-functions #'yasnippet-capf)
-    (yas-minor-mode)
-    ;; (company-mode)
-    ;; (company-quickhelp-mode)
-    ;; (corfu-mode)
-    ;; setup capf for tempel
-    ;; others
-    ;; (bug-reference-github-set-url-format)
-    ;;(electric-operator-mode) buggy?
-    ;; visual
-    (smart-hungry-delete-add-default-hooks)
-    (column-number-mode)
-    (visual-line-mode)
-    (push '("<=" . ?≤) prettify-symbols-alist)
-    (push '(">=" . ?≥) prettify-symbols-alist)
+  ;; (add-to-list 'completion-at-point-functions #'yasnippet-capf)
+  (yas-minor-mode)
+  ;; (company-mode)
+  ;; (company-quickhelp-mode)
+  ;; (corfu-mode)
+  ;; setup capf for tempel
+  ;; others
+  ;; (bug-reference-github-set-url-format)
+  ;;(electric-operator-mode) buggy?
+  ;; visual
+  (smart-hungry-delete-add-default-hooks)
+  (column-number-mode)
+  (visual-line-mode)
+  (push '("<=" . ?≤) prettify-symbols-alist)
+  (push '(">=" . ?≥) prettify-symbols-alist)
 
     (setq-local fill-column 80)
     (display-fill-column-indicator-mode)
@@ -1772,7 +1765,8 @@ then quit."
     (infer-indentation-style)
     (electric-indent-local-mode)
     (aggressive-indent-mode))
-  :hook (prog-mode-hook . sd/prog-mode-hook))
+
+(add-hook 'prog-mode-hook #'sd/prog-mode-hook)
 
 ;; ** completion
 
