@@ -464,7 +464,8 @@ then quit."
               zephyr:7b-beta-q6_K
               mistral:7b-instruct-v0.2-q6_K
               llama3:8b-instruct-q8_0))
-  (setopt gptel-api-key (auth-source-pass-get 'secret "openai")))
+  (if (not (getenv "DOCKER_BUILD"))
+      (setopt gptel-api-key (auth-source-pass-get 'secret "openai"))))
 
 ;; TODO
 (use-package agent-shell
@@ -472,7 +473,9 @@ then quit."
   :ensure t
   :custom (agent-shell-thought-process-expand-by-default t))
 
+
 (use-package whisper
+  :if (not (getenv "IN_DOCKER"))
   :vc (:url "https://github.com/natrys/whisper.el" :branch "master"))
 
 ;; * the greps
@@ -2520,4 +2523,3 @@ then quit."
   :ensure t
   :init (global-jinx-mode)
   :custom (jinx-languages "en_GB"))
-
