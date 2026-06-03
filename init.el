@@ -348,28 +348,26 @@ then quit."
 
 ;; * histories and save place
 
-(use-package savehist
-  :demand t
-  :custom
-  ((history-length 100) ;; t is way too large
-   (savehist-save-minibuffer-history t)
-   ;; what other variables to save?
-   (savehist-additional-variables '
-    (search-ring
-     regexp-search-ring
-     ;; kill-ring ;; don’t save
-     comint-input-ring
-     sr-history-registry
-     file-name-history
-     org-mark-ring
-     dogears-list
-     tablist-name-filter
-     winner-ring-alist
-     mark-ring
-     eshell-history-ring
-     kmacro-ring)))
-  :config
-  (savehist-mode 1))
+;; (use-package savehist
+;;   :init (savehist-mode)
+;;   :custom
+;;   ((history-length 100) ;; t is way too large
+;;    (savehist-save-minibuffer-history t)
+;;    ;; what other variables to save?
+;;    (savehist-additional-variables '
+;;     (search-ring
+;;      regexp-search-ring
+;;      ;; kill-ring ;; don’t save
+;;      comint-input-ring
+;;      sr-history-registry
+;;      file-name-history
+;;      org-mark-ring
+;;      dogears-list
+;;      tablist-name-filter
+;;      winner-ring-alist
+;;      mark-ring
+;;      eshell-history-ring
+;;      kmacro-ring))))
 
 ;; Save point history. Abbreviate file-names for confidentiality and make
 ;; backups of the master save-place file.
@@ -2125,9 +2123,9 @@ then quit."
   (completion-category-defaults nil) ;; Disable defaults, use our settings
   (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  :init
-  (savehist-mode))
+;; (use-package savehist
+;;   :init
+;;   (savehist-mode))
 
 ;; Emacs minibuffer configurations.
 (use-package emacs
