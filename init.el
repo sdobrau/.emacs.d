@@ -114,7 +114,43 @@ With prefix argument ASYNC, refresh asynchronously."
 ;; `use-package` is built-in in Emacs 29+, but require it explicitly.
 (require 'use-package)
 
-;; hard dependency, place first 
+;; hard dependency, place first
+
+;; magit-remote.el:29:11: Error: transient--init-suffix-key is already defined as something else than a generic function
+
+(use-package magit
+  :ensure t
+  :preface
+  ;; Signed-off if emacs.signOff true
+  ;; https://emacs.stackexchange.com/questions/85157/automatically-adding-signed-off-by-trailers-to-git-commits
+  (defun maybe-git-commit-signoff ()
+    "Potentially add a Signed-off-by trailer.
+
+Run \"git config set --local emacs.signOff true\" in a repository if you are
+sure it will always be appropriate to sign-off commits to it by default."
+    (when (magit-git-config-p "emacs.signOff")
+      (apply 'git-commit-signoff (git-commit-get-ident "Signed-off-by"))))
+
+  (defun maybe-git-commit-co-authored-by ()
+    "Potentially add a Co-authored-by trailer.
+
+Run \"git config set --local emacs.coAuthoredBy true\" in a repository if you are
+sure it will always be appropriate to sign-off commits to it by default."
+    (when (magit-git-config-p "emacs.coAuthoredBy")
+      (apply 'git-commit-co-authored (git-commit-get-ident "Co-authored-by"))))
+
+  (defun maybe-git-commit-reviewed-by ()
+    "Potentially add a Reviewed-by trailer.
+
+Run \"git config set --local emacs.reviewedBy true\" in a repository if you are
+sure it will always be appropriate to sign-off commits to it by default."
+    (when (magit-git-config-p "emacs.reviewedBy")
+      (apply 'git-commit-review (git-commit-get-ident "Reviewed-by"))))
+
+  :bind ("C-x M-g" . magit-dispatch)
+  :config (add-hook 'git-commit-setup-hook 'maybe-git-commit-signoff)
+  (add-hook 'git-commit-setup-hook 'maybe-git-commit-co-authored-by)
+  (add-hook 'git-commit-setup-hook 'maybe-git-commit-reviewed-by))
 
 (use-package aggressive-indent
   :ensure t
@@ -2434,10 +2470,6 @@ then quit."
   (add-to-list 'mc/unsupported-minor-modes 'corfu-mode))
 
 ;; * magit
-
-(use-package magit
-  :ensure t
-  :bind ("C-x M-g" . magit-dispatch))
 
 ;; * terraform
 
