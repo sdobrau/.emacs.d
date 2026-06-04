@@ -35,3 +35,12 @@ jobs:
         context: .
         push: true
         tags: ${{ vars.DOCKER_USERNAME }}/emacs:latest
+
+    # sign
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@v4.1.0
+    - name: Sign image with cosign
+      env:
+        COSIGN_KEY_BASE64: ${{ secrets.COSIGN_KEY_B64 }}
+      run: |
+        echo "$COSIGN_KEY_BASE64" | base64 -d > cosign.key && cosign sign --key cosign.key --yes serbandobrau/emacs:latest

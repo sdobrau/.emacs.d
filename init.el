@@ -197,6 +197,7 @@ sure it will always be appropriate to sign-off commits to it by default."
  mml-secure-smime-encrypt-to-self t
  mml-secure-smime-sign-with-sender t
  ;; composition
+ mail-host-address "archlinux"
  mail-user-agent 'message-user-agent
  compose-mail-user-agent-warnings nil
  message-ignored-cited-headers ""
