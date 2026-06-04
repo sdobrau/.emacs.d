@@ -76,12 +76,12 @@ RUN mkdir -p packages/quelpa/build && \
     pipx ensurepath && \
     . ~/.bashrc && \
     pipx install zuban && \
-    pipx install black && \
-    # js
-    npm intall -g jsfmt
-ENV DOCKER_BUILD="0"
+    pipx install black
 
-# Final
+USER root
+RUN npm install -g jsfmt # js
+ENV DOCKER_BUILD="0"
+# final
 FROM scratch
 COPY --from=builder / /
 ENV IN_DOCKER="1"
