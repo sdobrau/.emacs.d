@@ -211,6 +211,7 @@ sure it will always be appropriate to sign-off commits to it by default."
  smtpmail-stream-type 'ssl)
 
 (use-package notmuch
+  :if (not (getenv "IN_DOCKER"))
   :ensure t
   :preface
   (defun sd/notmuch-mark-all-read-and-quit ()
