@@ -474,7 +474,6 @@ then quit."
   :ensure t
   :custom (agent-shell-thought-process-expand-by-default t))
 
-
 (use-package whisper
   :if (not (getenv "IN_DOCKER"))
   :vc (:url "https://github.com/natrys/whisper.el" :branch "master"))

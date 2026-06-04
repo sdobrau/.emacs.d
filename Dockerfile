@@ -1,10 +1,12 @@
 FROM debian:sid as builder
 # essential deps
-ENV CC /usr/bin/gcc-11
-ENV CXX /usr/bn/g++-11
-ENV CFLAGS "-O2 -pipe -mtune=native -march=native -fomit-frame-pointer"
+ENV CC="/usr/bin/gcc-11"
+ENV CXX="/usr/bn/g++-11"
+ENV CFLAGS="-O2 -pipe -mtune=native -march=native -fomit-frame-pointer"
+ENV DOCKER_BUILD="1"
+ENV IN_DOCKER="1"
 RUN useradd -m emacs
-RUN apt update -y && apt install -y git \
+RUN apt-get update -y && apt-get install -y git \
     build-essential \
     texinfo \
     libgnutls28-dev \
@@ -17,18 +19,26 @@ RUN apt update -y && apt install -y git \
     libgtk-3-dev \
     libtree-sitter-dev \
     libmagick++-dev \
-    libjansson4 libjansson-dev
-# build deps
-RUN apt install -y gcc-11 \
+    libjansson4 libjansson-dev \
+    # build deps
+    gcc-11 \
     g++-11 \
     libgccjit0 \
     libgccjit-11-dev \
-    autoconf
-#RUN apt build-dep -y emacs
+    autoconf \
+    # dev deps
+    pipx \
+    npm \
+    ansible-lint \
+    yamllint \
+    mypy \
+    rubocop \
+    go
+
 USER emacs
 WORKDIR /tmp
 RUN git clone git://git.git.savannah.gnu.org/emacs.git
-WORKDIR emacs
+WORKDIR /tmp/emacs
 RUN ./autogen.sh && \
     ./configure \
     --with-native-compilation \
@@ -44,23 +54,31 @@ RUN ./autogen.sh && \
     --without-imagemagick && \
     make -j$(nproc --ignore=2) NATIVE_FULL_AOT=1
 USER root
-RUN make install
-
-# cleanup
-RUN rm -rf /tmp/emacs
-RUN apt remove -y \
+RUN make install && rm -rf /tmp/emacs && \
+    apt-get remove -y \
     gcc-11 \
     g++-11 \
     libgccjit-11-dev \
     autoconf
+
+# cleanup
+
 USER emacs
 WORKDIR /home/emacs
-RUN rm -rf .emacs.d
-RUN git clone https://github.com/sdobrau/.emacs.d
+RUN rm -rf .emacs.d && \
+    git clone https://github.com/sdobrau/.emacs.d
 # init emacs to download packages, install treesit grammars
 WORKDIR /home/emacs/.emacs.d
 # add this directory otherwise emacs errors out
-RUN mkdir -p packages/quelpa/build
-RUN emacs --batch -l early-init.el -l init.el --eval "(progn (treesit-auto-install-all) (ghostel-download-module))"
-
+RUN mkdir -p packages/quelpa/build && \
+    emacs --batch -l early-init.el -l init.el --eval \
+    "(progn (treesit-auto-install-all) (ghostel-download-module))" && \
+    # Ensure pipx in path and install pipx deps
+    pipx ensurepath && \
+    . ~/.bashrc && \
+    pipx install zuban && \
+    pipx install black && \
+    # js
+    npm intall -g jsfmt
+UNSET DOCKER_BUILD
 ENTRYPOINT ["emacs"]
