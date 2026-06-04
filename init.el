@@ -1736,6 +1736,7 @@ then quit."
   :ensure t)
 
 (use-package exercism
+  :if (not (getenv "IN_DOCKER"))
   :ensure t
   :demand t)
 
