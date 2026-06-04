@@ -80,5 +80,5 @@ RUN mkdir -p packages/quelpa/build && \
     pipx install black && \
     # js
     npm intall -g jsfmt
-UNSET DOCKER_BUILD
+ENV DOCKER_BUILD="0"
 ENTRYPOINT ["emacs"]

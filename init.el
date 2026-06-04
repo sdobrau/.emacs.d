@@ -465,7 +465,7 @@ then quit."
               zephyr:7b-beta-q6_K
               mistral:7b-instruct-v0.2-q6_K
               llama3:8b-instruct-q8_0))
-  (if (not (getenv "DOCKER_BUILD"))
+  (if (not (eq (getenv "DOCKER_BUILD") "1"))
       (setopt gptel-api-key (auth-source-pass-get 'secret "openai"))))
 
 ;; TODO
