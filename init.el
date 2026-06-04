@@ -1506,26 +1506,24 @@ then quit."
    (next-error-function #'flycheck-next-error-function)
    (previous-error-function #'flycheck-previous-error-function)))
 
+(use-package quick-peek
+  :ensure t)
+
 (use-package flycheck-inline
+  :after quick-peek
   :ensure t
   :hook (flycheck-mode-hook . flycheck-inline-mode)
   ;; use quick-peek for nice box display
   :config
-  (setopt
-   flycheck-inline-display-function
-   (lambda (msg pos err)
-     (let*
-         (
-          (ov (quick-peek-overlay-ensure-at pos))
-          (contents (quick-peek-overlay-contents ov)))
-       (setf (quick-peek-overlay-contents ov)
-             (concat
-              contents
-              (when contents
-                "\n")
-              msg))
-       (quick-peek-update ov)))
-   flycheck-inline-clear-function #'quick-peek-hide))
+
+  (setq flycheck-inline-display-function
+        (lambda (msg pos err)
+          (let* ((ov (quick-peek-overlay-ensure-at pos))
+                 (contents (quick-peek-overlay-contents ov)))
+            (setf (quick-peek-overlay-contents ov)
+                  (concat contents (when contents "\n") msg))
+            (quick-peek-update ov)))
+        flycheck-inline-clear-function #'quick-peek-hide))
 
 ;; * modes
 
