@@ -1579,14 +1579,17 @@ then quit."
 
 ;; ** asciidoc
 
+(package-install 'asciidoc-mode)
 (use-package asciidoc-mode
   :ensure t
-  :preface (defun sd/asciidoc-mode-hook ()
-             (interactive)
-             (visual-line-mode)
-             (remove-hook 'after-save-hook #'whitespace-cleanup))
-  :hook (asciidoc-mode-hook . sd/asciidoc-mode-hook)
   :config (asciidoc-install-grammars))
+
+(defun sd/asciidoc-mode-hook ()
+  (interactive)
+  (visual-line-mode)
+  (remove-hook 'after-save-hook #'whitespace-cleanup))
+
+(add-hook 'asciidoc-mode-hook #'sd/asciidoc-mode-hook)
 
 ;; ** lsp
 
