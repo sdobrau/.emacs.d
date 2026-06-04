@@ -2517,6 +2517,10 @@ then quit."
 (use-package dockerfile-mode
   :ensure t)
 
+(use-package flymake-hadolint
+  :ensure t
+  :hook (dockerfile-mode . flycheck-mode))
+
 (use-package anzu
   :ensure t)
 
