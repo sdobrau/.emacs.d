@@ -27,7 +27,7 @@ jobs:
 
     - name: Build and Squash Docker Image
       run: |
-        DOCKER_BUILDKIT=1 docker build --squash -t ${{ vars.DOCKER_USERNAME }}/emacs:latest .
+        docker buildx build --squash -t ${{ vars.DOCKER_USERNAME }}/emacs:latest .
 
     - name: Push Docker Image
       run: |
