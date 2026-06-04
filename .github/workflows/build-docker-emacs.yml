@@ -24,9 +24,18 @@ jobs:
         username: ${{ vars.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
-    - name: Build and push
-      uses: docker/build-push-action@v7
-      with:
-        context: .
-        push: true
-        tags: ${{ vars.DOCKER_USERNAME }}/emacs:latest
+
+    - name: Build and Squash Docker Image
+      run: |
+        DOCKER_BUILDKIT=1 docker build --squash -t ${{ vars.DOCKER_USERNAME }}/emacs:latest .
+
+    - name: Push Docker Image
+      run: |
+        docker push ${{ vars.DOCKER_USERNAME}}/emacs:latest
+
+    # - name: Build and push
+    #   uses: docker/build-push-action@v7
+    #   with:
+    #     context: .
+    #     push: true
+    #     tags: ${{ vars.DOCKER_USERNAME }}/emacs:latest
