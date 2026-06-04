@@ -80,4 +80,11 @@ RUN mkdir -p packages/quelpa/build && \
     # js
     npm intall -g jsfmt
 ENV DOCKER_BUILD="0"
+
+# Final
+FROM scratch
+COPY --from=builder / /
+ENV IN_DOCKER="1"
+USER emacs
+WORKDIR /home/emacs
 ENTRYPOINT ["emacs"]
