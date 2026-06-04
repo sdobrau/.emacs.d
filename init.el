@@ -1637,8 +1637,8 @@ then quit."
   :hook (ruby-mode-hook . ruby-end-mode))
 
 (use-package ruby
-  :hook ((ruby-mode-hook . ruby-ts-mode)
-         (ruby-ts-mode-hook . eglot-ensure))
+  :hook ((ruby-mode . ruby-ts-mode)
+         (ruby-ts-mode . eglot-ensure))
   :bind (:map ruby-ts-mode-map
               (("C-c C-l" . ruby-send-line)
                ("C-c C-b" . ruby-send-block)
