@@ -5,8 +5,7 @@ ENV CXX="/usr/bn/g++-11"
 ENV CFLAGS="-O2 -pipe -mtune=native -march=native -fomit-frame-pointer"
 ENV DOCKER_BUILD="1"
 ENV IN_DOCKER="1"
-RUN useradd -m emacs
-RUN apt-get update -y && apt-get install -y git \
+RUN useradd -m emacs && apt-get update -y && apt-get install -y git \
     build-essential \
     texinfo \
     libgnutls28-dev \
@@ -33,7 +32,7 @@ RUN apt-get update -y && apt-get install -y git \
     yamllint \
     mypy \
     rubocop \
-    go
+    golang
 
 USER emacs
 WORKDIR /tmp
