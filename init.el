@@ -1562,21 +1562,6 @@ then quit."
   (add-hook 'eshell-load-hook #'ghostel-eshell-visual-command-mode)
   (add-to-list 'project-switch-commands '(ghostel-project "Ghostel") t))
 
-(use-package detached
-  :ensure t
-  :init
-  (detached-init)
-  :bind (;; Replace `async-shell-command' with `detached-shell-command'
-         ([remap async-shell-command] . detached-shell-command)
-         ;; Replace `compile' with `detached-compile'
-         ([remap compile] . detached-compile)
-         ([remap recompile] . detached-compile-recompile)
-         ;; Replace built in completion of sessions with `consult'
-         ([remap detached-open-session] . detached-consult-session)
-         ("C-x f C-d" . detached-open-session))
-  :custom ((detached-show-output-on-attach t)
-           (detached-terminal-data-command system-type)))
-
 ;; ** asciidoc
 
 (package-install 'asciidoc-mode)
@@ -2406,30 +2391,31 @@ then quit."
 
 ;; * completion and config for yaml using yaml-pro and lang serv
 
-(defun sd/yaml-mode-hook ()
+(defun sd/yaml-ts-mode-hook ()
   (indent-bars-mode)
   (add-hook 'after-save-hook #'whitespace-cleanup))
 
 ;; TODO: test with ts -mode
-(use-package yaml
-  :hook (yaml-mode-hook . sd/yaml-mode-hook))
+(use-package yaml-ts-mode
+  :hook ((yaml-ts-mode . sd/yaml-ts-mode-hook)
+         (yaml-mode . yaml-ts-mode)))
 
-;; (use-package yaml-pro
-;;   :ensure t
-;;   :hook ((yaml-ts-mode-hook)
-;;          . yaml-pro-ts-mode)
-;;   :bind (:map yaml-pro-mode-map
-;;          (("C-M-f" . yaml-pro-next-subtree)
-;;           ("C-M-b" . yaml-pro-prev-subtree)
-;;           ("C-M-d" . yaml-pro-down-level)
-;;           ("C-M-u" . yaml-pro-up-level)
-;;           ("C-c w" . yaml-pro-mark-subtree)
-;;           ("C-c C-M-f" . yaml-pro-move-subtree-down)
-;;           ("C-c C-M-b" . yaml-pro-move-subtree-up))))
+  ;; (use-package yaml-pro
+  ;;   :ensure t
+  ;;   :hook ((yaml-ts-mode-hook)
+  ;;          . yaml-pro-ts-mode)
+  ;;   :bind (:map yaml-pro-mode-map
+  ;;          (("C-M-f" . yaml-pro-next-subtree)
+  ;;           ("C-M-b" . yaml-pro-prev-subtree)
+  ;;           ("C-M-d" . yaml-pro-down-level)
+  ;;           ("C-M-u" . yaml-pro-up-level)
+  ;;           ("C-c w" . yaml-pro-mark-subtree)
+  ;;           ("C-c C-M-f" . yaml-pro-move-subtree-down)
+  ;;           ("C-c C-M-b" . yaml-pro-move-subtree-up))))
 
 
-(use-package flycheck-yamllint
-  :ensure t)
+  (use-package flycheck-yamllint
+    :ensure t)
 
 (use-package yaml-imenu
   :ensure t
@@ -2445,7 +2431,6 @@ then quit."
   :ensure t
   :commands flymake-ansible-lint-setup
   :hook ((yaml-ts-mode . flymake-ansible-lint-setup)
-         (yaml-mode . flymake-ansible-lint-setup)
          (yaml-ts-mode . flymake-mode)
          (yaml-mode . flymake-mode)))
 
@@ -2530,3 +2515,10 @@ then quit."
   :ensure t
   :init (global-jinx-mode)
   :custom (jinx-languages "en_GB"))
+
+(use-package webpaste
+  :ensure t
+  :bind ("C-x f M-w" . webpaste-paste-region))
+
+(use-package indent-bars
+  :ensure t)

@@ -88,3 +88,5 @@ ENV IN_DOCKER="1"
 USER emacs
 WORKDIR /home/emacs
 ENTRYPOINT ["emacs"]
+
+# TODO: tflint
