@@ -442,6 +442,7 @@ then quit."
 ;; TODO: customize, various models, etc
 (use-package gptel
   :ensure t
+  :after exec-path-from-shell
   :hook
   ((gptel-post-response-functions . gptel-end-of-response)
    (gptel-post-stream . gptel-auto-scroll)
@@ -2522,3 +2523,9 @@ then quit."
 
 (use-package indent-bars
   :ensure t)
+
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-copy-envs '("OLLAMA_IP"))
+  (exec-path-from-shell-copy-envs '("PATH")))
