@@ -2375,22 +2375,21 @@ then quit."
   :hook ((yaml-ts-mode . sd/yaml-ts-mode-hook)
          (yaml-mode . yaml-ts-mode)))
 
-  ;; (use-package yaml-pro
-  ;;   :ensure t
-  ;;   :hook ((yaml-ts-mode-hook)
-  ;;          . yaml-pro-ts-mode)
-  ;;   :bind (:map yaml-pro-mode-map
-  ;;          (("C-M-f" . yaml-pro-next-subtree)
-  ;;           ("C-M-b" . yaml-pro-prev-subtree)
-  ;;           ("C-M-d" . yaml-pro-down-level)
-  ;;           ("C-M-u" . yaml-pro-up-level)
-  ;;           ("C-c w" . yaml-pro-mark-subtree)
-  ;;           ("C-c C-M-f" . yaml-pro-move-subtree-down)
-  ;;           ("C-c C-M-b" . yaml-pro-move-subtree-up))))
+;; (use-package yaml-pro
+;;   :ensure t
+;;   :hook ((yaml-ts-mode-hook)
+;;          . yaml-pro-ts-mode)
+;;   :bind (:map yaml-pro-mode-map
+;;          (("C-M-f" . yaml-pro-next-subtree)
+;;           ("C-M-b" . yaml-pro-prev-subtree)
+;;           ("C-M-d" . yaml-pro-down-level)
+;;           ("C-M-u" . yaml-pro-up-level)
+;;           ("C-c w" . yaml-pro-mark-subtree)
+;;           ("C-c C-M-f" . yaml-pro-move-subtree-down)
+;;           ("C-c C-M-b" . yaml-pro-move-subtree-up))))
 
-
-  (use-package flycheck-yamllint
-    :ensure t)
+(use-package flycheck-yamllint
+  :ensure t)
 
 (use-package yaml-imenu
   :ensure t
@@ -2503,3 +2502,7 @@ then quit."
   :config
   (exec-path-from-shell-copy-envs '("OLLAMA_IP"))
   (exec-path-from-shell-copy-envs '("PATH")))
+
+(use-package define-word
+  :ensure t
+  :bind ("M-s f w" . define-word))
