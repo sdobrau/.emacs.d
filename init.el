@@ -2506,3 +2506,8 @@ then quit."
 (use-package define-word
   :ensure t
   :bind ("M-s f w" . define-word))
+(use-package emacs-anki
+:custom ((emacs-anki-deck "work::everything")
+         (emacs-anki-interval 1))
+:config
+(emacs-anki-mode 1))
