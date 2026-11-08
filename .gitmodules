@@ -1,0 +1,3 @@
+[submodule "lib/emacs-anki"]
+	path = lib/emacs-anki
+	url = https://github.com/sdobrau/emacs-anki
